@@ -67,7 +67,7 @@ public class LambdaPushCommand implements Runnable {
         LambdaPushContext context = new LambdaPushContext()
                 .withSessionCredentials(sessionCredentials)
                 .withRootPath(absPath)
-                .withBambooPropertyHandler(handler)
+                .withPropertyHandler(handler)
                 .withLogger(cli.getLogger())
                 .withTaskProperties(getTaskProperties(sessionCredentials, cli.getLogger(), region, handler));
 

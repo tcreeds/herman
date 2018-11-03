@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import com.atlassian.bamboo.deployments.execution.DeploymentTaskContext;
 import com.atlassian.bamboo.variable.CustomVariableContext;
 import java.util.Set;
+
+import com.libertymutualgroup.herman.task.bamboo.TaskContextPropertyHandler;
 import org.junit.Test;
 import org.mockito.Mockito;
 

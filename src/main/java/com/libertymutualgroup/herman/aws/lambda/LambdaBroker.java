@@ -74,7 +74,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.libertymutualgroup.herman.aws.AwsExecException;
-import com.libertymutualgroup.herman.aws.credentials.BambooCredentialsHandler;
+import com.libertymutualgroup.herman.aws.credentials.CredentialsHandler;
 import com.libertymutualgroup.herman.aws.ecs.PushType;
 import com.libertymutualgroup.herman.aws.ecs.broker.dynamodb.DynamoDBBroker;
 import com.libertymutualgroup.herman.aws.ecs.broker.dynamodb.DynamoDBMixIns;
@@ -146,7 +146,7 @@ public class LambdaBroker {
         this.region = region;
 
         credentials = this.context.getSessionCredentials();
-        ClientConfiguration config = BambooCredentialsHandler.getConfiguration();
+        ClientConfiguration config = CredentialsHandler.getConfiguration();
 
         this.lambdaClient = AWSLambdaClientBuilder.standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -234,9 +234,9 @@ public class LambdaBroker {
 
         IAMBroker iamBroker = new IAMBroker(this.buildLogger);
         Role executionRole = iamBroker
-            .brokerAppRole(this.iamClient, this.configuration, policy, this.context.getBambooPropertyHandler(),
+            .brokerAppRole(this.iamClient, this.configuration, policy, this.context.getPropertyHandler(),
                 PushType.LAMBDA);
-        this.context.getBambooPropertyHandler().addProperty("app.iam", executionRole.getArn());
+        this.context.getPropertyHandler().addProperty("app.iam", executionRole.getArn());
 
         FunctionCode functionCode;
         try {
@@ -447,7 +447,7 @@ public class LambdaBroker {
                 this.buildLogger
                     .addLogEntry(String.format("... Using %s for execution permissions", LAMBDA_EXECUTION_PERMISSION));
                 String template = fileUtil.findFile(LAMBDA_EXECUTION_PERMISSION, false);
-                String mappedPermissionString = this.context.getBambooPropertyHandler().mapInProperties(template);
+                String mappedPermissionString = this.context.getPropertyHandler().mapInProperties(template);
                 final TypeReference<List<LambdaPermission>> listRef = new TypeReference<List<LambdaPermission>>() {};
                 try {
                     return this.mapper.readValue(mappedPermissionString, listRef);
@@ -471,7 +471,7 @@ public class LambdaBroker {
     }
 
     private String brokerKms(List<Tag> tags) {
-        KmsBroker kmsBroker = new KmsBroker(this.context.getLogger(), this.context.getBambooPropertyHandler(),
+        KmsBroker kmsBroker = new KmsBroker(this.context.getLogger(), this.context.getPropertyHandler(),
             this.fileUtil, this.context.getTaskProperties(), credentials, null, this.region);
         String keyArn = "";
         if (this.configuration.getUseKms()) {
@@ -509,7 +509,7 @@ public class LambdaBroker {
             mapper.addMixIn(AttributeDefinition.class, DynamoDBMixIns.class);
             mapper.addMixIn(Projection.class, DynamoDBMixIns.class);
 
-            definition = mapper.readValue(this.context.getBambooPropertyHandler().mapInProperties(template),
+            definition = mapper.readValue(this.context.getPropertyHandler().mapInProperties(template),
                 LambdaInjectConfiguration.class);
         } catch (FileNotFoundException e1) {
             buildLogger.addErrorLogEntry("No template found: " + LAMBDA_TEMPLATE_JSON, e1);
@@ -523,7 +523,7 @@ public class LambdaBroker {
 
     private void brokerSqs(LambdaInjectConfiguration definition) {
         if (definition.getQueues() != null) {
-            SqsBroker sqsBroker = new SqsBroker(this.buildLogger, this.context.getBambooPropertyHandler());
+            SqsBroker sqsBroker = new SqsBroker(this.buildLogger, this.context.getPropertyHandler());
             this.buildLogger.addLogEntry("Brokering SQS queues...");
             for (SqsQueue queue : definition.getQueues()) {
                 if (queue.getPolicyName() != null) {
@@ -538,7 +538,7 @@ public class LambdaBroker {
 
     private void brokerSns(LambdaInjectConfiguration definition) {
         if (definition.getTopics() != null) {
-            SnsBroker snsBroker = new SnsBroker(this.buildLogger, this.context.getBambooPropertyHandler());
+            SnsBroker snsBroker = new SnsBroker(this.buildLogger, this.context.getPropertyHandler());
             this.buildLogger.addLogEntry("Brokering SNS topics...");
             for (SnsTopic topic : definition.getTopics()) {
                 if (topic.getPolicyName() != null) {

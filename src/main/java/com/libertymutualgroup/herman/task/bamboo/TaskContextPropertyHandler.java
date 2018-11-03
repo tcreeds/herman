@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.libertymutualgroup.herman.aws.ecs;
+package com.libertymutualgroup.herman.task.bamboo;
 
 import com.atlassian.bamboo.deployments.execution.DeploymentTaskContext;
 import com.atlassian.bamboo.variable.CustomVariableContext;
 import com.atlassian.bamboo.variable.VariableContext;
 import com.atlassian.bamboo.variable.VariableDefinitionContext;
 import com.libertymutualgroup.herman.aws.AwsExecException;
+import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
 import com.libertymutualgroup.herman.logging.AtlassianBuildLogger;
 import com.libertymutualgroup.herman.util.FileUtil;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TaskContextPropertyHandler implements PropertyHandler {
+public class TaskContextPropertyHandler extends PropertyHandler {
 
     static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{([a-zA-Z0-9\\.\\_\\-]+)\\}");
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskContextPropertyHandler.class);
@@ -45,7 +46,7 @@ public class TaskContextPropertyHandler implements PropertyHandler {
     private Set<String> propertyKeysUsed = new HashSet<>();
 
     public TaskContextPropertyHandler(DeploymentTaskContext deploymentTaskContext,
-        CustomVariableContext customVariableContext) {
+                                      CustomVariableContext customVariableContext) {
         this.deploymentTaskContext = deploymentTaskContext;
         this.customVariableContext = customVariableContext;
     }
@@ -88,7 +89,7 @@ public class TaskContextPropertyHandler implements PropertyHandler {
 
     }
 
-    Set<String> getPropertiesToMatch(String template) {
+    public Set<String> getPropertiesToMatch(String template) {
         Set<String> propertiesToMatch = new HashSet<>();
         Matcher propMatcher = PROPERTY_PATTERN.matcher(template);
         while (propMatcher.find()) {
@@ -167,7 +168,7 @@ public class TaskContextPropertyHandler implements PropertyHandler {
         // Get value of a custom variable
         if (value == null) {
             for (Map.Entry<String, VariableDefinitionContext> entry : customVariableContext.getVariableContexts()
-                .entrySet()) {
+                    .entrySet()) {
                 if (key.equals(entry.getKey())) {
                     propertyKeysUsed.add(key);
                     value = entry.getValue().getValue();
@@ -192,7 +193,7 @@ public class TaskContextPropertyHandler implements PropertyHandler {
     private void importPropFiles() {
         String env = deploymentTaskContext.getDeploymentContext().getEnvironmentName();
         FileUtil util = new FileUtil(deploymentTaskContext.getRootDirectory().getAbsolutePath(),
-            new AtlassianBuildLogger(deploymentTaskContext.getBuildLogger()));
+                new AtlassianBuildLogger(deploymentTaskContext.getBuildLogger()));
         String envProps = util.findFile(env + ".properties", true);
 
         if (props != null && envProps != null) {
@@ -202,7 +203,7 @@ public class TaskContextPropertyHandler implements PropertyHandler {
             } catch (IOException e) {
                 LOGGER.debug("Error loading properties file: " + env, e);
                 deploymentTaskContext.getBuildLogger()
-                    .addBuildLogEntry("Error loading " + env + ".properties: " + e.getMessage());
+                        .addBuildLogEntry("Error loading " + env + ".properties: " + e.getMessage());
             }
         }
     }

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.libertymutualgroup.herman.aws.ecs;
+package com.libertymutualgroup.herman.cli;
 
 import com.libertymutualgroup.herman.aws.AwsExecException;
+import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
 import com.libertymutualgroup.herman.logging.HermanLogger;
 import com.libertymutualgroup.herman.util.FileUtil;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CliPropertyHandler implements PropertyHandler {
+public class CliPropertyHandler extends PropertyHandler {
 
     static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{([a-zA-Z0-9\\.\\_\\-]+)\\}");
     private static final Logger LOGGER = LoggerFactory.getLogger(CliPropertyHandler.class);
@@ -55,7 +56,8 @@ public class CliPropertyHandler implements PropertyHandler {
     /*
      * (non-Javadoc)
      *
-     * @see com.libertymutualgroup.herman.aws.ecs.PropertyHandler#addProperty(java.lang.String,
+     * @see com.libertymutualg
+     * group.herman.aws.ecs.PropertyHandler#addProperty(java.lang.String,
      * java.lang.String)
      */
     @Override
@@ -88,16 +90,6 @@ public class CliPropertyHandler implements PropertyHandler {
         }
         return result;
 
-    }
-
-    Set<String> getPropertiesToMatch(String template) {
-        Set<String> propertiesToMatch = new HashSet<>();
-        Matcher propMatcher = PROPERTY_PATTERN.matcher(template);
-        while (propMatcher.find()) {
-            String propVal = propMatcher.group();
-            propertiesToMatch.add(propVal);
-        }
-        return propertiesToMatch;
     }
 
     /*

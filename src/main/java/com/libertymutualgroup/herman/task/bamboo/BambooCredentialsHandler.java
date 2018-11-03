@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.libertymutualgroup.herman.aws.credentials;
+package com.libertymutualgroup.herman.task.bamboo;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
@@ -22,6 +22,8 @@ import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.atlassian.bamboo.task.CommonTaskContext;
 import com.atlassian.bamboo.variable.VariableContext;
 import com.atlassian.bamboo.variable.VariableDefinitionContext;
+import com.libertymutualgroup.herman.aws.credentials.CredentialsHandler;
+
 import java.util.Map;
 
 public class BambooCredentialsHandler extends CredentialsHandler {

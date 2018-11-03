@@ -72,9 +72,6 @@ import com.amazonaws.services.rds.AmazonRDS;
 import com.amazonaws.services.rds.AmazonRDSClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
-import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQS;
@@ -112,7 +109,6 @@ import com.libertymutualgroup.herman.aws.tags.HermanTag;
 import com.libertymutualgroup.herman.aws.tags.TagUtil;
 import com.libertymutualgroup.herman.logging.HermanLogger;
 import com.libertymutualgroup.herman.task.ecs.ECSPushTaskProperties;
-import com.libertymutualgroup.herman.util.ArnUtil;
 import com.libertymutualgroup.herman.util.FileUtil;
 import org.apache.logging.log4j.util.Strings;
 
@@ -135,7 +131,7 @@ public class EcsPush {
 
     private HermanLogger logger;
     private EcsPushContext pushContext;
-    private PropertyHandler bambooPropertyHandler;
+    private PropertyHandler propertyHandler;
     private ECSPushTaskProperties taskProperties;
 
     private AmazonIdentityManagement iamClient;
@@ -157,7 +153,7 @@ public class EcsPush {
 
     public EcsPush(EcsPushContext context) {
         this.logger = context.getLogger();
-        this.bambooPropertyHandler = context.getPropertyHandler();
+        this.propertyHandler = context.getPropertyHandler();
         this.taskProperties = context.getTaskProperties();
         this.pushContext = context;
 
@@ -261,7 +257,7 @@ public class EcsPush {
         Role appRole;
         if (definition.getIamRole() == null || definition.getAppName().equals(definition.getIamRole())) {
             logger.addLogEntry("Brokering role with policy " + customIamPolicyFileName);
-            appRole = iamBroker.brokerAppRole(iamClient, definition, customIamPolicy, bambooPropertyHandler);
+            appRole = iamBroker.brokerAppRole(iamClient, definition, customIamPolicy, propertyHandler);
         } else {
             logger.addLogEntry("Using existing role: " + definition.getIamRole());
             appRole = iamBroker.getRole(iamClient, definition.getIamRole());
@@ -270,7 +266,7 @@ public class EcsPush {
         if (definition.getIamOptOut() == null) {
             definition.setTaskRoleArn(appRole.getArn());
         }
-        bambooPropertyHandler.addProperty("app.iam", appRole.getArn());
+        propertyHandler.addProperty("app.iam", appRole.getArn());
 
         // Inject environment variables
         EcsDefaultEnvInjection injectMagic = new EcsDefaultEnvInjection();
@@ -336,7 +332,7 @@ public class EcsPush {
         if (taskProperties.getEcsConsoleLinkPattern() != null) {
             String consoleLink = String.format(
                 taskProperties.getEcsConsoleLinkPattern(),
-                bambooPropertyHandler.lookupVariable("account.id"),
+                propertyHandler.lookupVariable("account.id"),
                 region,
                 cluster,
                 family);
@@ -345,8 +341,8 @@ public class EcsPush {
     }
 
     private EcsPushDefinition getEcsPushDefinition() {
-        EcsDefinitionParser parser = new EcsDefinitionParser(bambooPropertyHandler);
-        String classpathTemplate = bambooPropertyHandler.lookupVariable("classpathTemplate");
+        EcsDefinitionParser parser = new EcsDefinitionParser(propertyHandler);
+        String classpathTemplate = propertyHandler.lookupVariable("classpathTemplate");
 
         String template;
         EcsPushDefinition definition;
@@ -552,7 +548,7 @@ public class EcsPush {
                         "Rollback never stabilized. Shutting down to stop flapping, we tried...");
                 } else {
                     throw new AwsExecException(
-                        "Application rolled back successfully. Marking Bamboo as failed for notice.");
+                        "Application rolled back successfully. Marking as failed for notice.");
                 }
             } else {
                 setUnsuccessfulServiceToZero(appName, ecsClient, clusterMetadata);
@@ -712,7 +708,7 @@ public class EcsPush {
 
 
     private String brokerKms(EcsPushDefinition definition, EcsClusterMetadata clusterMetadata) {
-        KmsBroker broker = new KmsBroker(logger, bambooPropertyHandler, fileUtil, taskProperties,
+        KmsBroker broker = new KmsBroker(logger, propertyHandler, fileUtil, taskProperties,
             this.pushContext.getSessionCredentials(), this.pushContext.getCustomConfigurationBucket(), this.pushContext.getRegion());
 
         List<HermanTag> tags = new ArrayList<>();
@@ -752,7 +748,7 @@ public class EcsPush {
     }
 
     private void brokerSqs(EcsPushDefinition definition) {
-        SqsBroker sqsBroker = new SqsBroker(logger, bambooPropertyHandler);
+        SqsBroker sqsBroker = new SqsBroker(logger, propertyHandler);
         if (definition.getQueues() != null) {
             for (SqsQueue queue : definition.getQueues()) {
                 if (queue.getPolicyName() != null) {
@@ -766,7 +762,7 @@ public class EcsPush {
     }
 
     private void brokerSns(EcsPushDefinition definition) {
-        SnsBroker snsBroker = new SnsBroker(logger, bambooPropertyHandler);
+        SnsBroker snsBroker = new SnsBroker(logger, propertyHandler);
         if (definition.getTopics() != null) {
             for (SnsTopic topic : definition.getTopics()) {
                 if (topic.getPolicyName() != null) {
@@ -820,7 +816,7 @@ public class EcsPush {
             NewRelicBrokerConfiguration newRelicBrokerConfiguration = new NewRelicBrokerConfiguration()
                 .withBrokerProperties(taskProperties.getNewRelic());
             NewRelicBroker newRelicBroker = new NewRelicBroker(
-                bambooPropertyHandler,
+                    propertyHandler,
                 logger,
                 fileUtil,
                 newRelicBrokerConfiguration,
@@ -844,9 +840,9 @@ public class EcsPush {
                 .withDimensions(new Dimension().withName("application").withValue(definition.getAppName()),
                     new Dimension().withName("cluster").withValue(definition.getCluster()),
                     new Dimension().withName("env")
-                        .withValue(bambooPropertyHandler.lookupVariable("bamboo.deploy.environment")),
+                        .withValue(propertyHandler.lookupVariable("deploy.environment")),
                     new Dimension().withName("deployProject")
-                        .withValue(bambooPropertyHandler.lookupVariable("bamboo.deploy.project")),
+                        .withValue(propertyHandler.lookupVariable("deploy.project")),
                     new Dimension().withName("type")
                         .withValue(System.getenv("bamboo_deploy_environment") != null ? "current-jar"
                             : "current-plugin"),
@@ -867,15 +863,15 @@ public class EcsPush {
                     new Dimension().withName("application").withValue(definition.getAppName()),
                     new Dimension().withName("cluster").withValue(definition.getCluster()),
                     new Dimension().withName("env")
-                        .withValue(bambooPropertyHandler.lookupVariable("bamboo.deploy.environment")),
+                        .withValue(propertyHandler.lookupVariable("deploy.environment")),
                     new Dimension().withName("deployProject")
-                        .withValue(bambooPropertyHandler.lookupVariable("bamboo.deploy.project")),
+                        .withValue(propertyHandler.lookupVariable("deploy.project")),
                     new Dimension().withName("type")
                         .withValue(System.getenv("bamboo_deploy_environment") != null ? "current-jar"
                             : "current-plugin"),
                     new Dimension().withName("engine").withValue(taskProperties.getEngine()),
                     new Dimension().withName("propKeysRequired").withValue(
-                        String.join(",", ((TaskContextPropertyHandler) bambooPropertyHandler).getPropertyKeysUsed())))
+                        String.join(",", propertyHandler.getPropertyKeysUsed())))
                 .withUnit(StandardUnit.Count).withValue(1.0).withTimestamp(new Date());
 
             cloudWatchClient.putMetricData(new PutMetricDataRequest().withNamespace("Herman/Deploy").withMetricData(d));

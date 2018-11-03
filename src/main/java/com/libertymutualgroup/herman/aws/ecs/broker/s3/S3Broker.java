@@ -46,7 +46,7 @@ import com.amazonaws.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.libertymutualgroup.herman.aws.AwsExecException;
-import com.libertymutualgroup.herman.aws.credentials.BambooCredentialsHandler;
+import com.libertymutualgroup.herman.aws.credentials.CredentialsHandler;
 import com.libertymutualgroup.herman.aws.ecs.EcsPushDefinition;
 import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
 import com.libertymutualgroup.herman.aws.ecs.broker.kms.KmsBroker;
@@ -120,12 +120,12 @@ public class S3Broker {
 
         AmazonS3 client = AmazonS3ClientBuilder.standard()
             .withCredentials(new AWSStaticCredentialsProvider(context.getSessionCredentials()))
-            .withClientConfiguration(BambooCredentialsHandler.getConfiguration()).withRegion(context.getRegion()).build();
+            .withClientConfiguration(CredentialsHandler.getConfiguration()).withRegion(context.getRegion()).build();
         brokerBucket(client, configuration, tags, policy);
         updateNotificationConfiguration(configuration, client);
 
-        buildLogger.addLogEntry("Setting bamboo.s3.brokered.name = " + configuration.getAppName());
-        buildLogger.addLogEntry("Setting bamboo.s3.brokered.region = " + client.getRegionName());
+        buildLogger.addLogEntry("Setting s3.brokered.name = " + configuration.getAppName());
+        buildLogger.addLogEntry("Setting s3.brokered.region = " + client.getRegionName());
         BucketMeta result = new BucketMeta();
         result.setName(configuration.getAppName());
         result.setRegion(client.getRegionName());
@@ -135,7 +135,7 @@ public class S3Broker {
     private String brokerKms(S3InjectConfiguration configuration, Map<String, String> tagMap) {
         AWSKMS kmsClient = AWSKMSClientBuilder.standard()
             .withCredentials(new AWSStaticCredentialsProvider(context.getSessionCredentials()))
-            .withClientConfiguration(BambooCredentialsHandler.getConfiguration()).withRegion(context.getRegion()).build();
+            .withClientConfiguration(CredentialsHandler.getConfiguration()).withRegion(context.getRegion()).build();
 
         KmsBroker kmsBroker = new KmsBroker(this.buildLogger, this.handler, this.context.getFileUtil(), this.taskProperties,
             this.context.getSessionCredentials(), null, this.context.getRegion());

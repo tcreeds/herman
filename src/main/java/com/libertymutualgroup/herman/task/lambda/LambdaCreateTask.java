@@ -23,9 +23,9 @@ import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.variable.CustomVariableContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.libertymutualgroup.herman.aws.AbstractDeploymentTask;
+import com.libertymutualgroup.herman.task.bamboo.AbstractDeploymentTask;
 import com.libertymutualgroup.herman.aws.AwsExecException;
-import com.libertymutualgroup.herman.aws.credentials.BambooCredentialsHandler;
+import com.libertymutualgroup.herman.task.bamboo.BambooCredentialsHandler;
 import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
 import com.libertymutualgroup.herman.aws.lambda.LambdaBroker;
 import com.libertymutualgroup.herman.aws.lambda.LambdaPushContext;
@@ -56,7 +56,7 @@ public class LambdaCreateTask extends AbstractDeploymentTask {
         LambdaPushContext context = new LambdaPushContext()
             .withSessionCredentials(sessionCredentials)
             .withRootPath(taskContext.getRootDirectory().getAbsolutePath())
-            .withBambooPropertyHandler(handler)
+            .withPropertyHandler(handler)
             .withLogger(buildLogger)
             .withTaskProperties(getTaskProperties(sessionCredentials, buildLogger, region, handler));
 

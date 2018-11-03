@@ -24,7 +24,7 @@ public class LambdaPushContext {
 
     private AWSCredentials sessionCredentials;
     private String rootPath;
-    private PropertyHandler bambooPropertyHandler;
+    private PropertyHandler propertyHandler;
     private HermanLogger logger;
     private CommonTaskProperties taskProperties;
 
@@ -44,12 +44,12 @@ public class LambdaPushContext {
         this.rootPath = rootPath;
     }
 
-    public PropertyHandler getBambooPropertyHandler() {
-        return bambooPropertyHandler;
+    public PropertyHandler getPropertyHandler() {
+        return propertyHandler;
     }
 
-    public void setBambooPropertyHandler(PropertyHandler bambooPropertyHandler) {
-        this.bambooPropertyHandler = bambooPropertyHandler;
+    public void setPropertyHandler(PropertyHandler propertyHandler) {
+        this.propertyHandler = propertyHandler;
     }
 
     public HermanLogger getLogger() {
@@ -78,9 +78,9 @@ public class LambdaPushContext {
         return this;
     }
 
-    public LambdaPushContext withBambooPropertyHandler(
-        final PropertyHandler bambooPropertyHandler) {
-        this.bambooPropertyHandler = bambooPropertyHandler;
+    public LambdaPushContext withPropertyHandler(
+        final PropertyHandler propertyHandler) {
+        this.propertyHandler = propertyHandler;
         return this;
     }
 
@@ -100,7 +100,7 @@ public class LambdaPushContext {
         return "LambdaPushContext{" +
             "sessionCredentials=" + sessionCredentials +
             ", rootPath='" + rootPath + '\'' +
-            ", bambooPropertyHandler=" + bambooPropertyHandler +
+            ", propertyHandler=" + propertyHandler +
             ", logger=" + logger +
             ", taskProperties=" + taskProperties +
             '}';

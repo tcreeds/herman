@@ -15,16 +15,37 @@
  */
 package com.libertymutualgroup.herman.aws.ecs;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public interface PropertyHandler {
+public abstract class PropertyHandler {
 
-    void addProperty(String key, String value);
+    static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{([a-zA-Z0-9\\.\\_\\-]+)\\}");
+    private Set<String> propertyKeysUsed = new HashSet<>();
 
-    String mapInProperties(String template);
+    public abstract void addProperty(String key, String value);
 
-    Properties lookupProperties(String... propList);
+    public abstract String mapInProperties(String template);
 
-    String lookupVariable(String inputKey);
+    public abstract Properties lookupProperties(String... propList);
+
+    public abstract String lookupVariable(String inputKey);
+
+    public Set<String> getPropertiesToMatch(String template) {
+        Set<String> propertiesToMatch = new HashSet<>();
+        Matcher propMatcher = PROPERTY_PATTERN.matcher(template);
+        while (propMatcher.find()) {
+            String propVal = propMatcher.group();
+            propertiesToMatch.add(propVal);
+        }
+        return propertiesToMatch;
+    }
+
+    public Set<String> getPropertyKeysUsed() {
+        return propertyKeysUsed;
+    }
 
 }

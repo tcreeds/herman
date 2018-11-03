@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.libertymutualgroup.herman.aws;
+package com.libertymutualgroup.herman.task.bamboo;
 
 import com.atlassian.bamboo.deployments.execution.DeploymentTaskContext;
 import com.atlassian.bamboo.deployments.execution.DeploymentTaskType;
@@ -27,7 +27,7 @@ public abstract class AbstractDeploymentTask implements DeploymentTaskType {
     private final CustomVariableContext customVariableContext;
 
     /**
-     * @param customVariableContext bamboo context to read variables.
+     * @param customVariableContext context to read variables.
      */
     public AbstractDeploymentTask(CustomVariableContext customVariableContext) {
         this.customVariableContext = customVariableContext;

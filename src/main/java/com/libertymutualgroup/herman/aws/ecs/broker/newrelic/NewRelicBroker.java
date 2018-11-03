@@ -111,8 +111,8 @@ public class NewRelicBroker {
         String policyName, String newRelicApplicationName, String newrelicLicenseKey) {
         NewRelicConfiguration newRelicConfiguration = getNewRelicConfiguration(newRelicConfigurationDefinition);
         NewRelicApplicationDeploymentRequest newRelicApplicationDeployment = new NewRelicApplicationDeploymentRequest()
-            .withRevision(propertyHandler.lookupVariable("bamboo.planRepository.revision"))
-            .withVersion(propertyHandler.lookupVariable("bamboo.deploy.version"));
+            .withRevision(propertyHandler.lookupVariable("planRepository.revision"))
+            .withVersion(propertyHandler.lookupVariable("deploy.version"));
 
         return new NewRelicBrokerRequest()
             .withPolicyName(policyName)

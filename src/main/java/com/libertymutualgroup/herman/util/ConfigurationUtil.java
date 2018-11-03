@@ -12,7 +12,7 @@ import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.libertymutualgroup.herman.aws.credentials.BambooCredentialsHandler;
+import com.libertymutualgroup.herman.task.bamboo.BambooCredentialsHandler;
 import com.libertymutualgroup.herman.logging.HermanLogger;
 import org.apache.commons.io.IOUtils;
 

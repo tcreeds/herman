@@ -102,7 +102,7 @@ public class CftPush { ;
                 "Getting CFT variables from Lambda: " + this.taskProperties.getCftPushVariableBrokerLambda());
             introspectEnvironment();
         }
-        injectBambooContext();
+        injectContext();
         importPropFiles(env);
 
         if (this.taskContext.getTemplateParameters() != null) {
@@ -154,22 +154,22 @@ public class CftPush { ;
         }
     }
 
-    private void injectBambooContext() {
-        Properties bambooContext = this.propertyHandler.lookupProperties(BUILD_NUMBER, MAVEN_GROUP, MAVEN_ART,
+    private void injectContext() {
+        Properties context = this.propertyHandler.lookupProperties(BUILD_NUMBER, MAVEN_GROUP, MAVEN_ART,
             MAVEN_VERS);
 
         String randomPass = RandomStringUtils.randomAlphanumeric(RANDOM_PASSWORD_LENGTH);
         props.put("RandomPassword", randomPass);
 
-        String build = "BUILD" + bambooContext.getProperty(BUILD_NUMBER);
+        String build = "BUILD" + context.getProperty(BUILD_NUMBER);
         props.put("BuildId", build);
 
-        String art = bambooContext.getProperty(MAVEN_ART);
+        String art = context.getProperty(MAVEN_ART);
         if (art != null) {
             props.put("ArtifactId", art);
         }
 
-        String versionId = bambooContext.getProperty("maven.versionId");
+        String versionId = context.getProperty("maven.versionId");
         if (versionId != null) {
             props.put("Version", versionId);
         }
@@ -193,15 +193,15 @@ public class CftPush { ;
         tags.add(new Tag().withKey(this.taskProperties.getAppTagKey() + "_env").withValue(deployEnvironment));
         tags.add(new Tag().withKey(this.taskProperties.getSbuTagKey()).withValue(this.taskProperties.getSbu()));
 
-        Properties bambooContext = this.propertyHandler.lookupProperties(BUILD_NUMBER, MAVEN_GROUP, MAVEN_ART,
+        Properties context = this.propertyHandler.lookupProperties(BUILD_NUMBER, MAVEN_GROUP, MAVEN_ART,
             MAVEN_VERS);
 
-        String artifactId = bambooContext.getProperty(MAVEN_ART);
+        String artifactId = context.getProperty(MAVEN_ART);
         if (artifactId != null && StringUtils.isNotEmpty(artifactId)) {
             tags.add(new Tag().withKey(this.taskProperties.getCompany() + "_gav")
-                .withValue(bambooContext.getProperty(MAVEN_GROUP) + ":"
-                    + bambooContext.getProperty(MAVEN_ART) + ":"
-                    + bambooContext.getProperty(MAVEN_VERS)));
+                .withValue(context.getProperty(MAVEN_GROUP) + ":"
+                    + context.getProperty(MAVEN_ART) + ":"
+                    + context.getProperty(MAVEN_VERS)));
         }
 
         try {

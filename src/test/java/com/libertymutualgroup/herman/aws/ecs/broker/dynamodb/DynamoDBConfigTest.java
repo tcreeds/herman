@@ -9,11 +9,12 @@ import static org.mockito.Mockito.when;
 import com.libertymutualgroup.herman.aws.ecs.EcsDefinitionParser;
 import com.libertymutualgroup.herman.aws.ecs.EcsPushDefinition;
 import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
-import com.libertymutualgroup.herman.aws.ecs.TaskContextPropertyHandler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
+import com.libertymutualgroup.herman.task.bamboo.TaskContextPropertyHandler;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 

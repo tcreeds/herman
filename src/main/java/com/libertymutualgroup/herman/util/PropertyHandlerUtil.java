@@ -8,19 +8,17 @@ import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest;
 import com.atlassian.bamboo.deployments.execution.DeploymentTaskContext;
 import com.atlassian.bamboo.variable.CustomVariableContext;
-import com.libertymutualgroup.herman.aws.credentials.BambooCredentialsHandler;
-import com.libertymutualgroup.herman.aws.ecs.CliPropertyHandler;
+import com.libertymutualgroup.herman.cli.CliPropertyHandler;
 import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
-import com.libertymutualgroup.herman.aws.ecs.TaskContextPropertyHandler;
 import com.libertymutualgroup.herman.logging.HermanLogger;
+import com.libertymutualgroup.herman.task.bamboo.TaskContextPropertyHandler;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class PropertyHandlerUtil {
 
     public static PropertyHandler getTaskContextPropertyHandler(DeploymentTaskContext taskContext,
-        AWSCredentials sessionCredentials, CustomVariableContext customVariableContext) {
+                                                                AWSCredentials sessionCredentials, CustomVariableContext customVariableContext) {
         final PropertyHandler handler = new TaskContextPropertyHandler(taskContext, customVariableContext);
         PropertyHandlerUtil.addStandardProperties(sessionCredentials, handler);
         return handler;

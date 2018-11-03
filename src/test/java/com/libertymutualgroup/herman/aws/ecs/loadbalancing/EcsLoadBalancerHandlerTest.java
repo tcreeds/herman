@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.model.AddTagsRequest;
 import com.amazonaws.services.elasticloadbalancing.model.ApplySecurityGroupsToLoadBalancerRequest;
@@ -19,11 +18,10 @@ import com.amazonaws.services.elasticloadbalancing.model.DuplicateLoadBalancerNa
 import com.amazonaws.services.elasticloadbalancing.model.Listener;
 import com.amazonaws.services.elasticloadbalancing.model.LoadBalancerDescription;
 import com.amazonaws.services.elasticloadbalancing.model.Tag;
-import com.amazonaws.services.lambda.AWSLambda;
 import com.libertymutualgroup.herman.aws.ecs.EcsDefinitionParser;
 import com.libertymutualgroup.herman.aws.ecs.EcsPushDefinition;
 import com.libertymutualgroup.herman.aws.ecs.PropertyHandler;
-import com.libertymutualgroup.herman.aws.ecs.TaskContextPropertyHandler;
+import com.libertymutualgroup.herman.task.bamboo.TaskContextPropertyHandler;
 import com.libertymutualgroup.herman.aws.ecs.cluster.EcsClusterMetadata;
 import com.libertymutualgroup.herman.logging.HermanLogger;
 import com.libertymutualgroup.herman.logging.SysoutLogger;

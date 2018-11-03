@@ -21,7 +21,7 @@ import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskType;
 import com.atlassian.bamboo.variable.VariableType;
-import com.libertymutualgroup.herman.aws.credentials.BambooCredentialsHandler;
+import com.libertymutualgroup.herman.task.bamboo.BambooCredentialsHandler;
 import com.libertymutualgroup.herman.aws.ecr.EcrCreate;
 import com.libertymutualgroup.herman.aws.ecr.EcrLogin;
 import com.libertymutualgroup.herman.logging.AtlassianBuildLogger;
